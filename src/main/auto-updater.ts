@@ -1,5 +1,5 @@
 import { autoUpdater, UpdateInfo } from 'electron-updater';
-import { BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -66,5 +66,10 @@ export function checkForUpdates() {
 }
 
 export function installUpdate() {
-  autoUpdater.quitAndInstall(false, true);
+  autoUpdater.autoInstallOnAppQuit = true;
+  setImmediate(() => {
+    app.removeAllListeners('window-all-closed');
+    BrowserWindow.getAllWindows().forEach(w => w.destroy());
+    autoUpdater.quitAndInstall(false, true);
+  });
 }
