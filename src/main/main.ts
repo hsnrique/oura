@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { AIService } from './ai-service';
 import * as database from './database';
+import { initAutoUpdater, checkForUpdates, installUpdate } from './auto-updater';
 
 function sendToRenderer(channel: string, ...args: any[]) {
   const win = BrowserWindow.getFocusedWindow();
@@ -191,6 +192,11 @@ function buildMenu() {
     {
       label: 'Help',
       submenu: [
+        {
+          label: 'Check for Updates...',
+          click: () => checkForUpdates(),
+        },
+        { type: 'separator' as const },
         {
           label: 'Keyboard Shortcuts',
           accelerator: 'CmdOrCtrl+/',
@@ -468,6 +474,10 @@ function setupIPC() {
   ipcMain.handle('shell:open-external', (_e, url: string) => {
     shell.openExternal(url);
   });
+
+  ipcMain.handle('updater:check', () => checkForUpdates());
+  ipcMain.handle('updater:install', () => installUpdate());
+  ipcMain.handle('app:get-version', () => app.getVersion());
 }
 
 app.whenReady().then(() => {
@@ -488,6 +498,10 @@ app.whenReady().then(() => {
   buildMenu();
   setupIPC();
   createWindow();
+
+  if (app.isPackaged) {
+    initAutoUpdater();
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

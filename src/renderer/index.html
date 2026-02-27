@@ -347,7 +347,17 @@
 
           <div class="settings-section">
             <div class="settings-section-title">About</div>
-            <p class="settings-about">Oura Browser v0.1.0 — Open source, privacy-first.</p>
+            <p class="settings-about">Oura Browser <span id="settings-version"></span></p>
+            <div id="update-status" class="update-status hidden">
+              <div id="update-status-text"></div>
+              <div id="update-progress-bar" class="update-progress-bar hidden">
+                <div id="update-progress-fill" class="update-progress-fill"></div>
+              </div>
+            </div>
+            <div class="settings-data-actions" style="margin-top: 8px;">
+              <button id="btn-check-updates" class="btn-secondary btn-sm">Check for Updates</button>
+              <button id="btn-install-update" class="btn-primary btn-sm hidden">Restart & Update</button>
+            </div>
           </div>
         </div>
       </div>

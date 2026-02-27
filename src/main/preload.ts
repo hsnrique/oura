@@ -75,6 +75,38 @@ contextBridge.exposeInMainWorld('electronAPI', {
   shell: {
     openExternal: (url: string) => ipcRenderer.invoke('shell:open-external', url),
   },
+  updater: {
+    checkForUpdates: () => ipcRenderer.invoke('updater:check'),
+    installUpdate: () => ipcRenderer.invoke('updater:install'),
+    onAvailable: (callback: (info: any) => void) => {
+      const listener = (_e: any, info: any) => callback(info);
+      ipcRenderer.on('updater:available', listener);
+      return () => ipcRenderer.removeListener('updater:available', listener);
+    },
+    onNotAvailable: (callback: () => void) => {
+      const listener = () => callback();
+      ipcRenderer.on('updater:not-available', listener);
+      return () => ipcRenderer.removeListener('updater:not-available', listener);
+    },
+    onProgress: (callback: (progress: any) => void) => {
+      const listener = (_e: any, progress: any) => callback(progress);
+      ipcRenderer.on('updater:progress', listener);
+      return () => ipcRenderer.removeListener('updater:progress', listener);
+    },
+    onDownloaded: (callback: (info: any) => void) => {
+      const listener = (_e: any, info: any) => callback(info);
+      ipcRenderer.on('updater:downloaded', listener);
+      return () => ipcRenderer.removeListener('updater:downloaded', listener);
+    },
+    onError: (callback: (message: string) => void) => {
+      const listener = (_e: any, message: string) => callback(message);
+      ipcRenderer.on('updater:error', listener);
+      return () => ipcRenderer.removeListener('updater:error', listener);
+    },
+  },
+  app: {
+    getVersion: () => ipcRenderer.invoke('app:get-version'),
+  },
   onMenuAction: (callback: (action: string) => void) => {
     ipcRenderer.on('menu:action', (_event, action: string) => callback(action));
   },

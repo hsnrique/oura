@@ -84,6 +84,8 @@ export function setupSettings(
       hideSettings();
     }
   });
+
+  setupUpdateUI();
 }
 
 export async function showSettings(state: BrowserState) {
@@ -98,10 +100,70 @@ export async function showSettings(state: BrowserState) {
   const existingKey = await window.electronAPI.ai.getApiKey();
   apiKeyInput.placeholder = existingKey ? 'Key saved — enter new key to replace' : 'Enter API key';
   apiKeyInput.value = '';
+
+  const version = await window.electronAPI.app.getVersion();
+  document.getElementById('settings-version')!.textContent = `v${version}`;
 }
 
 export function hideSettings() {
   document.getElementById('settings-overlay')!.classList.add('hidden');
+}
+
+function setupUpdateUI() {
+  const statusEl = document.getElementById('update-status')!;
+  const statusText = document.getElementById('update-status-text')!;
+  const progressBar = document.getElementById('update-progress-bar')!;
+  const progressFill = document.getElementById('update-progress-fill')!;
+  const btnCheck = document.getElementById('btn-check-updates')!;
+  const btnInstall = document.getElementById('btn-install-update')!;
+
+  btnCheck.addEventListener('click', () => {
+    btnCheck.textContent = 'Checking...';
+    btnCheck.setAttribute('disabled', 'true');
+    window.electronAPI.updater.checkForUpdates();
+  });
+
+  btnInstall.addEventListener('click', () => {
+    window.electronAPI.updater.installUpdate();
+  });
+
+  window.electronAPI.updater.onNotAvailable(() => {
+    statusEl.classList.remove('hidden');
+    statusText.textContent = 'You are on the latest version.';
+    progressBar.classList.add('hidden');
+    btnCheck.textContent = 'Check for Updates';
+    btnCheck.removeAttribute('disabled');
+  });
+
+  window.electronAPI.updater.onAvailable((info: any) => {
+    statusEl.classList.remove('hidden');
+    statusText.textContent = `Update v${info.version} available — downloading...`;
+    btnCheck.textContent = 'Check for Updates';
+    btnCheck.removeAttribute('disabled');
+  });
+
+  window.electronAPI.updater.onProgress((progress: any) => {
+    statusEl.classList.remove('hidden');
+    progressBar.classList.remove('hidden');
+    const pct = Math.round(progress.percent);
+    progressFill.style.width = `${pct}%`;
+    statusText.textContent = `Downloading update... ${pct}%`;
+  });
+
+  window.electronAPI.updater.onDownloaded((info: any) => {
+    statusEl.classList.remove('hidden');
+    progressBar.classList.add('hidden');
+    statusText.textContent = `Update v${info.version} ready — restart to apply.`;
+    btnInstall.classList.remove('hidden');
+  });
+
+  window.electronAPI.updater.onError((message: string) => {
+    statusEl.classList.remove('hidden');
+    progressBar.classList.add('hidden');
+    statusText.textContent = `Update check failed.`;
+    btnCheck.textContent = 'Check for Updates';
+    btnCheck.removeAttribute('disabled');
+  });
 }
 
 async function renderSettingsAvatar(_state: BrowserState) {

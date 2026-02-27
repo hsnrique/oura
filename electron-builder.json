@@ -1,6 +1,11 @@
 {
   "appId": "io.oura.browser",
   "productName": "Oura Browser",
+  "publish": {
+    "provider": "github",
+    "owner": "hsnrique",
+    "repo": "oura"
+  },
   "directories": {
     "buildResources": "build",
     "output": "release"

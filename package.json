@@ -1,7 +1,7 @@
 {
   "name": "oura-browser",
   "productName": "Oura Browser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The browser, reimagined with AI",
   "author": "Henrique Martins",
   "license": "MIT",
@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.0.0",
-    "better-sqlite3": "^12.6.2"
+    "better-sqlite3": "^12.6.2",
+    "electron-updater": "^6.8.3"
   }
 }

@@ -128,3 +128,32 @@
   color: var(--text-tertiary);
   line-height: 1.5;
 }
+
+.update-status {
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.update-status-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.update-progress-bar {
+  margin-top: 8px;
+  height: 4px;
+  background: var(--bg-surface);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.update-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 300ms ease;
+}

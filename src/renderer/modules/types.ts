@@ -52,6 +52,18 @@ declare global {
       shell: {
         openExternal: (url: string) => Promise<void>;
       };
+      updater: {
+        checkForUpdates: () => Promise<void>;
+        installUpdate: () => Promise<void>;
+        onAvailable: (callback: (info: { version: string; releaseDate: string }) => void) => () => void;
+        onNotAvailable: (callback: () => void) => () => void;
+        onProgress: (callback: (progress: { percent: number; transferred: number; total: number; bytesPerSecond: number }) => void) => () => void;
+        onDownloaded: (callback: (info: { version: string; releaseDate: string }) => void) => () => void;
+        onError: (callback: (message: string) => void) => () => void;
+      };
+      app: {
+        getVersion: () => Promise<string>;
+      };
       onMenuAction: (callback: (action: string) => void) => void;
     };
   }
