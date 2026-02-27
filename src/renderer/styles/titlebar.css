@@ -1,0 +1,167 @@
+/* ========== Titlebar ========== */
+
+#titlebar {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+}
+
+#titlebar-drag {
+  -webkit-app-region: drag;
+  height: 12px;
+  width: 100%;
+}
+
+/* ========== Tab Bar ========== */
+
+#tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 80px 4px 80px;
+  height: 38px;
+}
+
+#tabs-container {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+#tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 200px;
+  min-width: 0;
+  border: none;
+  transition: all var(--transition);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.tab.dragging {
+  opacity: 0.4;
+}
+
+.tab:hover {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+}
+
+.tab.active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.tab.pinned {
+  max-width: 38px;
+  min-width: 38px;
+  padding: 5px;
+  justify-content: center;
+}
+
+.tab.pinned .tab-title {
+  display: none;
+}
+
+.tab.pinned .tab-close {
+  display: none;
+}
+
+.tab-favicon {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.tab-favicon-placeholder {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-favicon-placeholder svg {
+  width: 8px;
+  height: 8px;
+  color: var(--text-muted);
+}
+
+.tab-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.tab-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: all var(--transition);
+  opacity: 0;
+}
+
+.tab:hover .tab-close {
+  opacity: 1;
+}
+
+.tab-close:hover {
+  background: var(--border);
+  color: var(--text-primary);
+}
+
+#btn-new-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+#btn-new-tab:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}

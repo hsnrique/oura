@@ -1,0 +1,81 @@
+import { contextBridge, ipcRenderer } from 'electron';
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  ai: {
+    setApiKey: (key: string) => ipcRenderer.invoke('ai:set-api-key', key),
+    getApiKey: () => ipcRenderer.invoke('ai:get-api-key'),
+    summarize: (html: string, url: string) => ipcRenderer.invoke('ai:summarize', html, url),
+    chat: (message: string, pageContext: string, history: Array<{ role: string; content: string }>) =>
+      ipcRenderer.invoke('ai:chat', message, pageContext, history),
+    onStreamChunk: (callback: (chunk: string) => void) => {
+      const listener = (_event: any, chunk: string) => callback(chunk);
+      ipcRenderer.on('ai:stream-chunk', listener);
+      return () => ipcRenderer.removeListener('ai:stream-chunk', listener);
+    },
+    onStreamEnd: (callback: () => void) => {
+      const listener = () => callback();
+      ipcRenderer.on('ai:stream-end', listener);
+      return () => ipcRenderer.removeListener('ai:stream-end', listener);
+    },
+  },
+  db: {
+    getProfile: () => ipcRenderer.invoke('db:get-profile'),
+    updateProfile: (data: any) => ipcRenderer.invoke('db:update-profile', data),
+    pickAvatar: () => ipcRenderer.invoke('db:pick-avatar'),
+    getAvatarDataUrl: () => ipcRenderer.invoke('db:get-avatar-data-url'),
+    getBookmarks: () => ipcRenderer.invoke('db:get-bookmarks'),
+    addBookmark: (url: string, title: string, favicon: string) => ipcRenderer.invoke('db:add-bookmark', url, title, favicon),
+    removeBookmark: (url: string) => ipcRenderer.invoke('db:remove-bookmark', url),
+    isBookmarked: (url: string) => ipcRenderer.invoke('db:is-bookmarked', url),
+    getHistory: (limit?: number) => ipcRenderer.invoke('db:get-history', limit),
+    addHistory: (url: string, title: string, favicon: string) => ipcRenderer.invoke('db:add-history', url, title, favicon),
+    clearHistory: () => ipcRenderer.invoke('db:clear-history'),
+    searchHistory: (query: string, limit?: number) => ipcRenderer.invoke('db:search-history', query, limit),
+    getShortcuts: () => ipcRenderer.invoke('db:get-shortcuts'),
+    addShortcut: (url: string, title: string, favicon: string) => ipcRenderer.invoke('db:add-shortcut', url, title, favicon),
+    removeShortcut: (url: string) => ipcRenderer.invoke('db:remove-shortcut', url),
+    getZoomLevel: (domain: string) => ipcRenderer.invoke('db:get-zoom', domain),
+    setZoomLevel: (domain: string, level: number) => ipcRenderer.invoke('db:set-zoom', domain, level),
+    exportToFile: () => ipcRenderer.invoke('db:export-to-file'),
+    importFromFile: () => ipcRenderer.invoke('db:import-from-file'),
+    clearAll: () => ipcRenderer.invoke('db:clear-all'),
+    migrateLocalStorage: (data: any) => ipcRenderer.invoke('db:migrate-localstorage', data),
+  },
+  downloads: {
+    openFile: (filePath: string) => ipcRenderer.invoke('download:open-file', filePath),
+    openFolder: (filePath: string) => ipcRenderer.invoke('download:open-folder', filePath),
+    onStarted: (callback: (item: any) => void) => {
+      const listener = (_e: any, item: any) => callback(item);
+      ipcRenderer.on('download:started', listener);
+      return () => ipcRenderer.removeListener('download:started', listener);
+    },
+    onProgress: (callback: (item: any) => void) => {
+      const listener = (_e: any, item: any) => callback(item);
+      ipcRenderer.on('download:progress', listener);
+      return () => ipcRenderer.removeListener('download:progress', listener);
+    },
+    onDone: (callback: (item: any) => void) => {
+      const listener = (_e: any, item: any) => callback(item);
+      ipcRenderer.on('download:done', listener);
+      return () => ipcRenderer.removeListener('download:done', listener);
+    },
+  },
+  permissions: {
+    onRequest: (callback: (permission: string) => void) => {
+      ipcRenderer.on('permission:request', (_e, perm) => callback(perm));
+    },
+    respond: (granted: boolean) => ipcRenderer.send('permission:response', granted),
+  },
+  certificate: {
+    onError: (callback: (url: string) => void) => {
+      ipcRenderer.on('certificate:error', (_e, url) => callback(url));
+    },
+    respond: (proceed: boolean) => ipcRenderer.send('certificate:response', proceed),
+  },
+  shell: {
+    openExternal: (url: string) => ipcRenderer.invoke('shell:open-external', url),
+  },
+  onMenuAction: (callback: (action: string) => void) => {
+    ipcRenderer.on('menu:action', (_event, action: string) => callback(action));
+  },
+});

@@ -1,0 +1,138 @@
+/* ========== Loading Progress Bar ========== */
+
+#loading-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover), var(--accent));
+  background-size: 200% 100%;
+  z-index: 9999;
+  transition: width 400ms ease, opacity 300ms ease;
+  opacity: 0;
+  width: 0;
+  pointer-events: none;
+  animation: shimmer 1.5s infinite linear;
+}
+
+#loading-bar.active {
+  opacity: 1;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ========== Context Menu ========== */
+
+.context-menu {
+  position: fixed;
+  z-index: 10000;
+  min-width: 180px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  box-shadow: var(--shadow-xl);
+  backdrop-filter: blur(20px);
+  animation: contextFadeIn 100ms ease;
+}
+
+@keyframes contextFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all var(--transition);
+}
+
+.context-menu-item:hover {
+  background: var(--accent-dim);
+  color: var(--text-primary);
+}
+
+.context-menu-item.danger:hover {
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--red);
+}
+
+.context-menu-separator {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 8px;
+}
+
+.context-menu-shortcut {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+/* ========== Loading Indicator ========== */
+
+.ai-loading {
+  display: flex;
+  gap: 5px;
+  padding: 8px 0;
+}
+
+.ai-loading span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.ai-loading span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.ai-loading span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+

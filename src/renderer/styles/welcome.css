@@ -1,0 +1,447 @@
+/* ========== Welcome Page ========== */
+
+#welcome-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  z-index: 10;
+  overflow: hidden;
+}
+
+#welcome-page.hidden {
+  display: none;
+}
+
+#welcome-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#welcome-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  z-index: 1;
+  margin-top: -40px;
+  animation: welcomeFadeIn 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes welcomeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#welcome-greeting {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  opacity: 0.85;
+}
+
+#welcome-logo {
+  width: 64px;
+  height: 64px;
+  opacity: 0.8;
+  margin-bottom: 2px;
+  filter: brightness(0.95);
+  animation: welcomeFloat 6s ease-in-out infinite;
+}
+
+@keyframes welcomeFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+#welcome-content h1 {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(135deg,
+      var(--text-primary) 0%,
+      var(--accent) 40%,
+      var(--accent-hover) 70%,
+      var(--text-primary) 100%);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+#welcome-content>p {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+  margin-bottom: 28px;
+  letter-spacing: 0.01em;
+}
+
+/* ========== Search Bar ========== */
+
+#welcome-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 560px;
+  max-width: 90vw;
+  padding: 14px 22px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+#welcome-search:focus-within {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 4px var(--accent-dim),
+    0 12px 40px rgba(0, 0, 0, 0.35);
+  background: var(--bg-elevated);
+  transform: scale(1.01);
+}
+
+#welcome-search svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color var(--transition);
+}
+
+#welcome-search:focus-within svg {
+  color: var(--accent);
+}
+
+#welcome-url-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: inherit;
+}
+
+#welcome-url-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ========== Shortcuts Grid ========== */
+
+#shortcuts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 40px;
+  margin-top: 40px;
+  max-width: 640px;
+  z-index: 1;
+  animation: welcomeFadeIn 700ms cubic-bezier(0.16, 1, 0.3, 1) 150ms backwards;
+}
+
+.shortcut-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 14px 14px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100px;
+  position: relative;
+}
+
+.shortcut-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  background: radial-gradient(ellipse at center,
+      var(--accent-dim) 0%,
+      transparent 70%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.shortcut-item:hover::before {
+  opacity: 1;
+}
+
+.shortcut-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.shortcut-item:active {
+  transform: translateY(-1px);
+  transition-duration: 80ms;
+}
+
+.shortcut-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 250ms ease;
+}
+
+.shortcut-item:hover .shortcut-icon {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: var(--bg-hover);
+}
+
+.shortcut-icon img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.shortcut-icon svg {
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+}
+
+.shortcut-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  transition: color var(--transition);
+}
+
+.shortcut-item:hover .shortcut-label {
+  color: var(--text-primary);
+}
+
+.shortcut-add {
+  border: 1px dashed var(--border);
+  background: transparent;
+}
+
+.shortcut-add::before {
+  display: none;
+}
+
+.shortcut-add:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.shortcut-add .shortcut-icon {
+  background: transparent;
+  box-shadow: none;
+}
+
+.shortcut-add:hover .shortcut-icon {
+  background: transparent;
+  box-shadow: none;
+}
+
+.shortcut-add .shortcut-icon svg {
+  color: var(--text-muted);
+  transition: color var(--transition);
+}
+
+.shortcut-add:hover .shortcut-icon svg {
+  color: var(--accent);
+}
+
+/* ========== Welcome Bookmarks ========== */
+
+#welcome-bookmarks {
+  z-index: 1;
+  width: 100%;
+  max-width: 640px;
+  padding: 0 40px;
+  margin-top: 32px;
+  animation: welcomeFadeIn 700ms cubic-bezier(0.16, 1, 0.3, 1) 250ms backwards;
+}
+
+.welcome-bookmarks-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+.welcome-bookmarks-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.welcome-bookmark-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 200ms ease;
+  text-decoration: none;
+  max-width: 200px;
+}
+
+.welcome-bookmark-item:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.welcome-bookmark-favicon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.welcome-bookmark-favicon-fallback {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.welcome-bookmark-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.welcome-bookmark-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.welcome-bookmark-url {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+/* ========== Add Shortcut Dialog ========== */
+
+#add-shortcut-dialog {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 360px;
+  max-width: 90vw;
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  animation: welcomeFadeIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#add-shortcut-dialog input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+#add-shortcut-dialog input:focus {
+  border-color: var(--accent);
+}
+
+#add-shortcut-dialog input::placeholder {
+  color: var(--text-muted);
+}
+
+.add-shortcut-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}

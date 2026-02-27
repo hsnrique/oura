@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <div id="app">
+    <div id="loading-bar"></div>
+
+    <div id="titlebar">
+      <div id="titlebar-drag"></div>
+
+      <div id="tab-bar">
+        <div id="tabs-container"></div>
+        <button id="btn-new-tab" title="New Tab">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div id="nav-bar">
+        <div id="nav-controls">
+          <button id="btn-back" class="nav-btn" title="Back" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <button id="btn-forward" class="nav-btn" title="Forward" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <button id="btn-reload" class="nav-btn" title="Reload">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div id="url-bar-container">
+          <div id="url-security" class="insecure">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <input id="url-bar" type="text" placeholder="Search or enter URL" spellcheck="false" autocomplete="off" />
+          <div id="autocomplete-dropdown"></div>
+        </div>
+
+        <div id="nav-actions">
+          <button id="btn-bookmark" class="nav-btn" title="Bookmark">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </button>
+          <button id="btn-ai" class="nav-btn ai-btn" title="AI Assistant">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M12 2a4 4 0 0 1 4 4v1a1 1 0 0 0 1 1h1a4 4 0 0 1 0 8h-1a1 1 0 0 0-1 1v1a4 4 0 0 1-8 0v-1a1 1 0 0 0-1-1H6a4 4 0 0 1 0-8h1a1 1 0 0 0 1-1V6a4 4 0 0 1 4-4z">
+              </path>
+              <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+          </button>
+          <button id="btn-settings" class="nav-btn" title="Settings (⌘,)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+              </path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="bookmarks-bar">
+      <div id="bookmarks-bar-items"></div>
+    </div>
+
+    <div id="content-area">
+      <div id="webview-container"></div>
+
+      <div id="downloads-panel">
+        <div class="downloads-header">
+          <span>Downloads</span>
+          <button id="btn-close-downloads" class="nav-btn" title="Close">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div id="downloads-list"></div>
+      </div>
+
+      <div id="find-bar">
+        <input id="find-input" type="text" placeholder="Find on page..." spellcheck="false" autocomplete="off" />
+        <span id="find-count"></span>
+        <button class="find-btn" id="find-prev" title="Previous">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+        <button class="find-btn" id="find-next" title="Next">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <button class="find-btn" id="find-close" title="Close">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div id="ai-panel" class="hidden">
+        <div id="ai-resize-handle"></div>
+        <div id="ai-panel-header">
+          <span id="ai-panel-title">Gemini</span>
+          <button id="btn-close-ai" class="nav-btn" title="Close">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div id="ai-actions">
+          <button class="ai-action-btn" data-action="summarize">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="21" y1="10" x2="3" y2="10"></line>
+              <line x1="21" y1="6" x2="3" y2="6"></line>
+              <line x1="21" y1="14" x2="3" y2="14"></line>
+              <line x1="21" y1="18" x2="3" y2="18"></line>
+            </svg>
+            Summarize
+          </button>
+          <button class="ai-action-btn" data-action="explain">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            Explain
+          </button>
+          <button class="ai-action-btn" data-action="key-facts">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+              </polygon>
+            </svg>
+            Key Facts
+          </button>
+          <button class="ai-action-btn" data-action="translate">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+              </path>
+            </svg>
+            Translate
+          </button>
+          <button class="ai-action-btn" data-action="clear">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Clear
+          </button>
+        </div>
+
+        <div id="ai-messages"></div>
+
+        <div id="ai-input-container">
+          <input id="ai-input" type="text" placeholder="Ask about this page..." spellcheck="false" />
+          <button id="btn-send-ai" title="Send">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="onboarding" class="overlay hidden">
+      <div class="overlay-backdrop"></div>
+      <div class="onboarding-content">
+        <div id="onboarding-step-1" class="onboarding-step active">
+          <img class="onboarding-logo" src="./assets/logo.png" alt="Oura" />
+          <h1>Welcome to Oura</h1>
+          <p>Let's set things up. What should we call you?</p>
+          <input id="onboarding-name" type="text" placeholder="Your name" spellcheck="false" autocomplete="off" />
+          <button id="onboarding-next-1" class="btn-primary onboarding-btn">Continue</button>
+        </div>
+
+        <div id="onboarding-step-2" class="onboarding-step">
+          <h2>Pick your search engine</h2>
+          <p>Where should we search when you type in the URL bar?</p>
+          <div id="onboarding-engines" class="engine-grid">
+            <button class="engine-option active" data-engine="google">
+              <img src="https://www.google.com/favicon.ico" alt="" />
+              <span>Google</span>
+            </button>
+            <button class="engine-option" data-engine="duckduckgo">
+              <img src="https://duckduckgo.com/favicon.ico" alt="" />
+              <span>DuckDuckGo</span>
+            </button>
+            <button class="engine-option" data-engine="bing">
+              <img src="https://www.bing.com/favicon.ico" alt="" />
+              <span>Bing</span>
+            </button>
+            <button class="engine-option" data-engine="brave">
+              <img src="https://brave.com/static-assets/images/brave-favicon.png" alt="" />
+              <span>Brave</span>
+            </button>
+          </div>
+          <button id="onboarding-next-2" class="btn-primary onboarding-btn">Continue</button>
+        </div>
+
+        <div id="onboarding-step-3" class="onboarding-step">
+          <h2>Set up AI</h2>
+          <p>Enter your Gemini API key to enable the AI assistant. You can skip this and add it later in settings.</p>
+          <input id="onboarding-api-key" type="password" placeholder="Gemini API key (optional)" spellcheck="false"
+            autocomplete="off" />
+          <div class="onboarding-btns">
+            <button id="onboarding-skip-key" class="btn-secondary onboarding-btn">Skip</button>
+            <button id="onboarding-finish" class="btn-primary onboarding-btn">Get Started</button>
+          </div>
+        </div>
+
+        <div class="onboarding-dots">
+          <span class="dot active" data-step="1"></span>
+          <span class="dot" data-step="2"></span>
+          <span class="dot" data-step="3"></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="settings-overlay" class="overlay hidden">
+      <div class="overlay-backdrop" id="settings-backdrop"></div>
+      <div class="settings-panel">
+        <div class="settings-header">
+          <h2>Settings</h2>
+          <button id="btn-close-settings" class="nav-btn" title="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="settings-body">
+          <div class="settings-section">
+            <div class="settings-section-title">Profile</div>
+            <div class="settings-profile-row">
+              <div id="settings-avatar" class="settings-avatar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <button id="btn-change-avatar" class="btn-secondary btn-sm">Change Photo</button>
+            </div>
+            <div class="settings-field">
+              <label>Name</label>
+              <input id="settings-name" type="text" placeholder="Your name" spellcheck="false" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">Search</div>
+            <div class="settings-field">
+              <label>Default search engine</label>
+              <select id="settings-search-engine">
+                <option value="google">Google</option>
+                <option value="duckduckgo">DuckDuckGo</option>
+                <option value="bing">Bing</option>
+                <option value="brave">Brave Search</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">Appearance</div>
+            <div class="settings-field">
+              <label>Theme</label>
+              <select id="settings-theme">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">AI</div>
+            <div class="settings-field">
+              <label>Gemini API Key</label>
+              <input id="settings-api-key" type="password" placeholder="Enter API key" spellcheck="false"
+                autocomplete="off" />
+            </div>
+            <button id="btn-save-api-key-settings" class="btn-primary btn-sm">Save Key</button>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">Data</div>
+            <div class="settings-data-actions">
+              <button id="btn-export-data" class="btn-secondary btn-sm">Export Backup</button>
+              <button id="btn-import-data" class="btn-secondary btn-sm">Import Backup</button>
+              <button id="btn-clear-history-settings" class="btn-secondary btn-sm btn-danger">Clear History</button>
+              <button id="btn-clear-all-data" class="btn-secondary btn-sm btn-danger">Reset All Data</button>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">About</div>
+            <p class="settings-about">Oura Browser v0.1.0 — Open source, privacy-first.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="api-key-modal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <div class="modal-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M12 2a4 4 0 0 1 4 4v1a1 1 0 0 0 1 1h1a4 4 0 0 1 0 8h-1a1 1 0 0 0-1 1v1a4 4 0 0 1-8 0v-1a1 1 0 0 0-1-1H6a4 4 0 0 1 0-8h1a1 1 0 0 0 1-1V6a4 4 0 0 1 4-4z">
+            </path>
+            <circle cx="12" cy="12" r="2"></circle>
+          </svg>
+        </div>
+        <h2>Set up AI</h2>
+        <p>Enter your Gemini API key to enable the AI assistant.</p>
+        <input id="api-key-input" type="password" placeholder="Gemini API key" spellcheck="false" autocomplete="off" />
+        <div class="modal-buttons">
+          <button id="btn-skip-key" class="btn-secondary">Skip</button>
+          <button id="btn-save-key" class="btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="welcome-page" class="hidden">
+      <canvas id="welcome-canvas"></canvas>
+      <div id="welcome-content">
+        <!-- <span id="welcome-greeting"></span> -->
+        <img id="welcome-logo" src="./assets/logoHome.png" alt="Oura" />
+        <h1>oura</h1>
+        <p>The browser, reimagined with AI</p>
+        <div id="welcome-search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input id="welcome-url-input" type="text" placeholder="Search or enter URL" spellcheck="false"
+            autocomplete="off" />
+        </div>
+      </div>
+      <div id="shortcuts-grid"></div>
+      <div id="welcome-bookmarks"></div>
+    </div>
+
+    <div id="history-overlay">
+      <div class="history-backdrop" id="history-backdrop"></div>
+      <div class="history-panel">
+        <div class="history-header">
+          <h2>History</h2>
+          <button id="btn-close-history" class="nav-btn" title="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="history-search">
+          <input type="text" placeholder="Search history..." spellcheck="false" autocomplete="off" />
+        </div>
+        <div class="history-list"></div>
+      </div>
+    </div>
+
+    <div id="command-palette">
+      <div id="command-palette-backdrop"></div>
+      <div id="command-palette-content">
+        <div id="command-palette-input-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input id="command-palette-input" type="text" placeholder="Search tabs, bookmarks, or type a URL..."
+            spellcheck="false" autocomplete="off" />
+        </div>
+        <div id="command-palette-results"></div>
+      </div>
+    </div>
+
+    <div id="shortcuts-modal">
+      <div id="shortcuts-modal-backdrop"></div>
+      <div id="shortcuts-modal-content">
+        <h2>Keyboard Shortcuts</h2>
+        <div class="shortcuts-section">
+          <div class="shortcuts-section-title">Navigation</div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">New Tab</span>
+            <div class="shortcut-row-keys"><span class="key">&#8984;</span><span class="key">T</span></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Close Tab</span>
+            <div class="shortcut-row-keys"><span class="key">&#8984;</span><span class="key">W</span></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Reopen Closed Tab</span>
+            <div class="shortcut-row-keys"><span class="key">&#8984;</span><span class="key">&#8679;</span><span
+                class="key">T</span></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Focus URL Bar</span>
+            <div class="shortcut-row-keys"><span class="key">&#8984;</span><span class="key">L</span></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Reload Page</span>
+            <div class="shortcut-row-keys"><span class="key">&#8984;</span><span class="key">R</span></div>
+          </div>
+        </div>
+        <div class="shortcuts-section">
+          <div class="shortcuts-section-title">Features</div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Command Palette</span>
+            <div class="shortcut-row-keys"><span class="key">&#8984;</span><span class="key">K</span></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Find on Page</span>
+            <div class="shortcut-row-keys"><span class="key">&#8984;</span><span class="key">F</span></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Toggle AI Panel</span>
+            <div class="shortcut-row-keys"><span class="key">&#8984;</span><span class="key">J</span></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Developer Tools</span>
+            <div class="shortcut-row-keys"><span class="key">F12</span></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">History</span>
+            <div class="shortcut-row-keys"><span class="key">&#8984;</span><span class="key">Y</span></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Keyboard Shortcuts</span>
+            <div class="shortcut-row-keys"><span class="key">&#8984;</span><span class="key">/</span></div>
+          </div>
+        </div>
+        <div class="shortcuts-section">
+          <div class="shortcuts-section-title">Tabs</div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Next Tab</span>
+            <div class="shortcut-row-keys"><span class="key">&#8963;</span><span class="key">Tab</span></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-row-label">Previous Tab</span>
+            <div class="shortcut-row-keys"><span class="key">&#8963;</span><span class="key">&#8679;</span><span
+                class="key">Tab</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./renderer.ts"></script>
+</body>
+
+</html>

@@ -1,0 +1,205 @@
+.onboarding-content {
+  position: relative;
+  z-index: 1;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  padding: 48px 40px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  animation: fadeScaleIn 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.onboarding-logo {
+  width: 64px;
+  height: 64px;
+  opacity: 0.7;
+  margin-bottom: 16px;
+}
+
+.onboarding-content h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.onboarding-content h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.onboarding-content p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.onboarding-content input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 150ms;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.onboarding-content input:focus {
+  border-color: var(--accent);
+}
+
+.onboarding-step {
+  display: none;
+}
+
+.onboarding-step.active {
+  display: block;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.btn-sm {
+  padding: 7px 16px;
+  font-size: 13px;
+}
+
+.btn-danger {
+  border-color: rgba(248, 113, 113, 0.3);
+  color: var(--red);
+}
+
+.btn-danger:hover {
+  background: rgba(248, 113, 113, 0.1);
+  border-color: var(--red);
+}
+
+.onboarding-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.onboarding-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.onboarding-btns .onboarding-btn {
+  width: auto;
+  flex: 1;
+}
+
+.engine-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.engine-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.engine-option:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.engine-option.active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--text-primary);
+}
+
+.engine-option img {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.onboarding-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.onboarding-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 200ms;
+}
+
+.onboarding-dots .dot.active {
+  background: var(--accent);
+  width: 20px;
+  border-radius: 4px;
+}
+

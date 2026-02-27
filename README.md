@@ -28,7 +28,7 @@ Oura is a modern, privacy-focused browser built with Electron, featuring a built
 ### Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/oura-browser.git
+git clone https://github.com/hsnrique/oura.git
 cd oura-browser
 npm install
 ```
@@ -74,5 +74,4 @@ The packaged app will be in the `release/` directory.
 
 [MIT](LICENSE) — Free to use, modify, and distribute with attribution.
 
-Made with ♥ by [Henrique Braga](https://github.com/YOUR_USERNAME)
-# oura
+Made with ♥ by [Henrique Braga](https://github.com/hsnrique)
