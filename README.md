@@ -74,4 +74,4 @@ The packaged app will be in the `release/` directory.
 
 [MIT](LICENSE) — Free to use, modify, and distribute with attribution.
 
-Made with ♥ by [Henrique Braga](https://github.com/hsnrique)
+Made with ♥ by [Henrique Martins](https://github.com/hsnrique)

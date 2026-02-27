@@ -3,7 +3,7 @@
   "productName": "Oura Browser",
   "version": "0.1.0",
   "description": "The browser, reimagined with AI",
-  "author": "Henrique Braga",
+  "author": "Henrique Martins",
   "license": "MIT",
   "main": "dist/main/main.js",
   "scripts": {
