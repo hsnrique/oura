@@ -4,7 +4,8 @@
   "publish": {
     "provider": "github",
     "owner": "hsnrique",
-    "repo": "oura"
+    "repo": "oura",
+    "releaseType": "release"
   },
   "directories": {
     "buildResources": "build",
