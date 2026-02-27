@@ -263,23 +263,34 @@
 
 #ai-input-container {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 12px 12px;
   border-top: 1px solid var(--border);
+}
+
+.ai-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
 }
 
 #ai-input {
   flex: 1;
   background: var(--bg-surface);
   border: 1px solid transparent;
-  border-radius: var(--radius-pill);
+  border-radius: 12px;
   padding: 9px 14px;
   color: var(--text-primary);
   font-size: 13px;
   font-family: inherit;
   outline: none;
-  transition: all var(--transition);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  resize: none;
+  overflow-y: auto;
+  min-height: 36px;
+  max-height: 120px;
+  line-height: 1.4;
 }
 
 #ai-input:focus {
@@ -311,3 +322,101 @@
   transform: scale(1.05);
 }
 
+.ai-header-left,
+.ai-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#ai-conversation-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+#ai-conversation-list.hidden {
+  display: none;
+}
+
+.ai-conv-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background var(--transition);
+  gap: 8px;
+}
+
+.ai-conv-item:hover {
+  background: var(--bg-elevated);
+}
+
+.ai-conv-item.active {
+  background: var(--accent-dim);
+  border-left: 2px solid var(--accent);
+}
+
+.ai-conv-title {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-conv-item.active .ai-conv-title {
+  color: var(--text-primary);
+}
+
+.ai-conv-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 4px;
+  opacity: 0;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.ai-conv-item:hover .ai-conv-delete {
+  opacity: 1;
+}
+
+.ai-conv-delete:hover {
+  color: var(--red, #ef4444);
+}
+
+.ai-capture-btn {
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+
+.ai-capture-btn.active {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+#btn-toggle-conversations.active {
+  color: var(--accent);
+}
+
+.ai-capture-hint {
+  font-size: 10px;
+  color: var(--accent);
+  padding: 6px 12px;
+  text-align: center;
+  animation: messageFadeIn 200ms ease;
+}
+
+.ai-capture-hint.hidden {
+  display: none;
+}

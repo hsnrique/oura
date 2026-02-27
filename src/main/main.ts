@@ -346,6 +346,70 @@ function createWindow() {
       callback(false);
     }
   });
+
+  setupWebviewContextMenu(mainWindow);
+}
+
+function setupWebviewContextMenu(win: BrowserWindow) {
+  win.webContents.on('did-attach-webview', (_event, wvContents) => {
+    wvContents.on('context-menu', (_e, params) => {
+      const menuItems: MenuItemConstructorOptions[] = [];
+
+      if (params.linkURL) {
+        menuItems.push({
+          label: 'Open Link in New Tab',
+          click: () => win.webContents.send('menu:action', 'open-url', params.linkURL),
+        });
+        menuItems.push({
+          label: 'Copy Link Address',
+          click: () => { require('electron').clipboard.writeText(params.linkURL); },
+        });
+        menuItems.push({ type: 'separator' });
+      }
+
+      if (params.hasImageContents && params.srcURL) {
+        menuItems.push({
+          label: 'Open Image in New Tab',
+          click: () => win.webContents.send('menu:action', 'open-url', params.srcURL),
+        });
+        menuItems.push({
+          label: 'Copy Image Address',
+          click: () => { require('electron').clipboard.writeText(params.srcURL); },
+        });
+        menuItems.push({
+          label: 'Save Image As...',
+          click: () => wvContents.downloadURL(params.srcURL),
+        });
+        menuItems.push({ type: 'separator' });
+      }
+
+      if (params.selectionText) {
+        menuItems.push({
+          label: 'Copy',
+          accelerator: 'CmdOrCtrl+C',
+          click: () => wvContents.copy(),
+        });
+        menuItems.push({ type: 'separator' });
+      }
+
+      if (params.isEditable) {
+        menuItems.push({ label: 'Cut', accelerator: 'CmdOrCtrl+X', click: () => wvContents.cut() });
+        menuItems.push({ label: 'Copy', accelerator: 'CmdOrCtrl+C', click: () => wvContents.copy() });
+        menuItems.push({ label: 'Paste', accelerator: 'CmdOrCtrl+V', click: () => wvContents.paste() });
+        menuItems.push({ label: 'Select All', accelerator: 'CmdOrCtrl+A', click: () => wvContents.selectAll() });
+        menuItems.push({ type: 'separator' });
+      }
+
+      menuItems.push({ label: 'Back', click: () => { if (wvContents.canGoBack()) wvContents.goBack(); } });
+      menuItems.push({ label: 'Forward', click: () => { if (wvContents.canGoForward()) wvContents.goForward(); } });
+      menuItems.push({ label: 'Reload', click: () => wvContents.reload() });
+      menuItems.push({ type: 'separator' });
+      menuItems.push({ label: 'Inspect Element', click: () => wvContents.inspectElement(params.x, params.y) });
+
+      const menu = Menu.buildFromTemplate(menuItems);
+      menu.popup({ window: win });
+    });
+  });
 }
 
 function setupIPC() {
@@ -383,6 +447,21 @@ function setupIPC() {
     try {
       let result = '';
       for await (const chunk of aiService.chat(message, pageContext, history)) {
+        result += chunk;
+        event.sender.send('ai:stream-chunk', chunk);
+      }
+      event.sender.send('ai:stream-end');
+      return { result };
+    } catch (err: any) {
+      return { error: err.message };
+    }
+  });
+
+  ipcMain.handle('ai:chat-with-image', async (event, message: string, imageBase64: string, pageContext: string, history: Array<{ role: string; content: string }>, memory: string) => {
+    if (!aiService) return { error: 'API key not set' };
+    try {
+      let result = '';
+      for await (const chunk of aiService.chatWithImage(message, imageBase64, pageContext, history, memory)) {
         result += chunk;
         event.sender.send('ai:stream-chunk', chunk);
       }
@@ -473,6 +552,31 @@ function setupIPC() {
 
   ipcMain.handle('shell:open-external', (_e, url: string) => {
     shell.openExternal(url);
+  });
+
+  ipcMain.handle('db:chat-create', (_e, title?: string) => database.createConversation(title));
+  ipcMain.handle('db:chat-list', (_e, limit?: number) => database.getConversations(limit));
+  ipcMain.handle('db:chat-messages', (_e, conversationId: number) => database.getConversationMessages(conversationId));
+  ipcMain.handle('db:chat-add-message', (_e, conversationId: number, role: string, content: string) => database.addChatMessage(conversationId, role, content));
+  ipcMain.handle('db:chat-update-title', (_e, conversationId: number, title: string) => database.updateConversationTitle(conversationId, title));
+  ipcMain.handle('db:chat-delete', (_e, conversationId: number) => database.deleteConversation(conversationId));
+  ipcMain.handle('db:chat-memory', (_e, excludeId?: number) => database.getRecentMemory(excludeId));
+
+  ipcMain.handle('ai:capture-tab', async () => {
+    const win = BrowserWindow.getFocusedWindow();
+    if (!win) return null;
+    const wvContents = win.webContents;
+    const allWv = wvContents.mainFrame.framesInSubtree;
+    for (const frame of allWv) {
+      try {
+        const wc = webContents.fromFrame(frame);
+        if (wc && wc.getType() === 'webview') {
+          const image = await wc.capturePage();
+          return image.toDataURL();
+        }
+      } catch { }
+    }
+    return null;
   });
 
   ipcMain.handle('updater:check', () => checkForUpdates());

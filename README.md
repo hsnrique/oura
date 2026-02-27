@@ -12,7 +12,7 @@
   <br />
 </div>
 
-Oura is a modern, privacy-focused desktop browser with a built-in AI assistant powered by Google Gemini. Ask questions about any page, summarize articles, translate content — all without leaving your browser.
+Oura is a modern, privacy-focused desktop browser with a built-in AI assistant powered by Gemini. Ask questions about any page, summarize articles, translate content — all without leaving your browser.
 
 <br />
 

@@ -10,6 +10,8 @@ declare global {
         chat: (message: string, pageContext: string, history: Array<{ role: string; content: string }>) => Promise<{ result?: string; error?: string }>;
         onStreamChunk: (callback: (chunk: string) => void) => () => void;
         onStreamEnd: (callback: () => void) => () => void;
+        captureTab: () => Promise<string | null>;
+        chatWithImage: (message: string, imageBase64: string, pageContext: string, history: Array<{ role: string; content: string }>, memory: string) => Promise<{ result?: string; error?: string }>;
       };
       db: {
         getProfile: () => Promise<any>;
@@ -33,6 +35,13 @@ declare global {
         importFromFile: () => Promise<boolean>;
         clearAll: () => Promise<void>;
         migrateLocalStorage: (data: any) => Promise<void>;
+        chatCreate: (title?: string) => Promise<any>;
+        chatList: (limit?: number) => Promise<any[]>;
+        chatMessages: (conversationId: number) => Promise<any[]>;
+        chatAddMessage: (conversationId: number, role: string, content: string) => Promise<void>;
+        chatUpdateTitle: (conversationId: number, title: string) => Promise<void>;
+        chatDelete: (conversationId: number) => Promise<void>;
+        chatMemory: (excludeId?: number) => Promise<string>;
       };
       downloads: {
         openFile: (filePath: string) => Promise<void>;
@@ -64,7 +73,7 @@ declare global {
       app: {
         getVersion: () => Promise<string>;
       };
-      onMenuAction: (callback: (action: string) => void) => void;
+      onMenuAction: (callback: (action: string, ...args: any[]) => void) => void;
     };
   }
 }
@@ -130,4 +139,6 @@ export interface BrowserState {
   animationFrame: number | null;
   profile: any;
   searchEngine: string;
+  currentConversationId: number | null;
+  screenCaptureEnabled: boolean;
 }

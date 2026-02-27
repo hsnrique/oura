@@ -139,6 +139,73 @@ function addLoadingIndicator(): HTMLElement {
   return loader;
 }
 
+async function ensureConversation(state: BrowserState): Promise<number> {
+  if (state.currentConversationId) return state.currentConversationId;
+  const conv = await window.electronAPI.db.chatCreate();
+  state.currentConversationId = conv.id;
+  renderConversationList(state);
+  return conv.id;
+}
+
+async function autoTitleConversation(state: BrowserState, firstMessage: string) {
+  const title = firstMessage.substring(0, 40) + (firstMessage.length > 40 ? '...' : '');
+  if (state.currentConversationId) {
+    await window.electronAPI.db.chatUpdateTitle(state.currentConversationId, title);
+    renderConversationList(state);
+  }
+}
+
+export async function renderConversationList(state: BrowserState) {
+  const listEl = document.getElementById('ai-conversation-list');
+  if (!listEl) return;
+
+  const conversations = await window.electronAPI.db.chatList();
+  listEl.innerHTML = '';
+
+  conversations.forEach((conv: any) => {
+    const item = document.createElement('div');
+    item.className = `ai-conv-item${conv.id === state.currentConversationId ? ' active' : ''}`;
+
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'ai-conv-title';
+    titleSpan.textContent = conv.title;
+    item.appendChild(titleSpan);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'ai-conv-delete';
+    deleteBtn.innerHTML = '&times;';
+    deleteBtn.title = 'Delete';
+    deleteBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await window.electronAPI.db.chatDelete(conv.id);
+      if (state.currentConversationId === conv.id) {
+        state.currentConversationId = null;
+        state.chatHistory = [];
+        document.getElementById('ai-messages')!.innerHTML = '';
+      }
+      renderConversationList(state);
+    });
+    item.appendChild(deleteBtn);
+
+    item.addEventListener('click', () => loadConversation(state, conv.id));
+    listEl.appendChild(item);
+  });
+}
+
+async function loadConversation(state: BrowserState, conversationId: number) {
+  state.currentConversationId = conversationId;
+  state.chatHistory = [];
+  document.getElementById('ai-messages')!.innerHTML = '';
+
+  const messages = await window.electronAPI.db.chatMessages(conversationId);
+  messages.forEach((msg: any) => {
+    addMessage(msg.role === 'user' ? 'user' : 'ai', msg.content);
+    state.chatHistory.push({ role: msg.role, content: msg.content });
+  });
+
+  renderConversationList(state);
+}
+
 export async function aiAction(state: BrowserState, prompt: string) {
   if (state.isStreaming) return;
 
@@ -147,6 +214,9 @@ export async function aiAction(state: BrowserState, prompt: string) {
 
   const { html, url } = await getPageContent(state);
   if (!html) { addMessage('ai', 'No page content available.'); return; }
+
+  const conversationId = await ensureConversation(state);
+  if (state.chatHistory.length === 0) autoTitleConversation(state, prompt);
 
   addMessage('user', prompt);
   const loader = addLoadingIndicator();
@@ -171,6 +241,8 @@ export async function aiAction(state: BrowserState, prompt: string) {
     if (contentEl) {
       state.chatHistory.push({ role: 'user', content: prompt });
       state.chatHistory.push({ role: 'model', content: rawContent });
+      window.electronAPI.db.chatAddMessage(conversationId, 'user', prompt);
+      window.electronAPI.db.chatAddMessage(conversationId, 'model', rawContent);
     }
   });
 
@@ -179,15 +251,21 @@ export async function aiAction(state: BrowserState, prompt: string) {
 }
 
 export async function sendChatMessage(state: BrowserState) {
-  const input = document.getElementById('ai-input') as HTMLInputElement;
+  const input = document.getElementById('ai-input') as HTMLTextAreaElement;
   const message = input.value.trim();
   if (!message || state.isStreaming) return;
 
   input.value = '';
+  input.style.height = 'auto';
+  const conversationId = await ensureConversation(state);
+  if (state.chatHistory.length === 0) autoTitleConversation(state, message);
+
   addMessage('user', message);
   const loader = addLoadingIndicator();
 
   const { html } = await getPageContent(state);
+  const memory = await window.electronAPI.db.chatMemory(conversationId);
+
   state.isStreaming = true;
   let contentEl: HTMLElement | null = null;
   let rawContent = '';
@@ -209,8 +287,19 @@ export async function sendChatMessage(state: BrowserState) {
     if (contentEl) {
       state.chatHistory.push({ role: 'user', content: message });
       state.chatHistory.push({ role: 'model', content: rawContent });
+      window.electronAPI.db.chatAddMessage(conversationId, 'user', message);
+      window.electronAPI.db.chatAddMessage(conversationId, 'model', rawContent);
     }
   });
+
+  if (state.screenCaptureEnabled) {
+    const screenshot = await window.electronAPI.ai.captureTab();
+    if (screenshot) {
+      const result = await window.electronAPI.ai.chatWithImage(message, screenshot, html, state.chatHistory, memory);
+      if (result.error) { loader.remove(); addMessage('ai', `Error: ${result.error}`); state.isStreaming = false; }
+      return;
+    }
+  }
 
   const result = await window.electronAPI.ai.chat(message, html, state.chatHistory);
   if (result.error) { loader.remove(); addMessage('ai', `Error: ${result.error}`); state.isStreaming = false; }
@@ -218,7 +307,27 @@ export async function sendChatMessage(state: BrowserState) {
 
 export function clearChat(state: BrowserState) {
   state.chatHistory = [];
+  state.currentConversationId = null;
   document.getElementById('ai-messages')!.innerHTML = '';
+}
+
+export async function newConversation(state: BrowserState) {
+  state.chatHistory = [];
+  state.currentConversationId = null;
+  document.getElementById('ai-messages')!.innerHTML = '';
+  renderConversationList(state);
+}
+
+export function toggleScreenCapture(state: BrowserState) {
+  state.screenCaptureEnabled = !state.screenCaptureEnabled;
+  const btn = document.getElementById('btn-screen-capture');
+  const hint = document.getElementById('ai-capture-hint');
+  const input = document.getElementById('ai-input') as HTMLTextAreaElement;
+  if (btn) btn.classList.toggle('active', state.screenCaptureEnabled);
+  if (hint) hint.classList.toggle('hidden', !state.screenCaptureEnabled);
+  if (input) input.placeholder = state.screenCaptureEnabled
+    ? 'Ask about this page or its images...'
+    : 'Ask about this page...';
 }
 
 export async function checkApiKey() {
@@ -239,4 +348,21 @@ export async function saveApiKey() {
 
 export function hideModal() {
   document.getElementById('api-key-modal')!.classList.add('hidden');
+}
+
+export async function initChatPanel(state: BrowserState) {
+  await renderConversationList(state);
+
+  document.getElementById('btn-new-chat')?.addEventListener('click', () => newConversation(state));
+
+  document.getElementById('btn-screen-capture')?.addEventListener('click', () => toggleScreenCapture(state));
+
+  const convToggle = document.getElementById('btn-toggle-conversations');
+  const convList = document.getElementById('ai-conversation-list');
+  if (convToggle && convList) {
+    convToggle.addEventListener('click', () => {
+      convList.classList.toggle('hidden');
+      convToggle.classList.toggle('active');
+    });
+  }
 }

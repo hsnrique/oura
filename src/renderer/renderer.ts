@@ -37,6 +37,8 @@ class Browser {
     animationFrame: null,
     profile: null,
     searchEngine: 'google',
+    currentConversationId: null,
+    screenCaptureEnabled: false,
   };
 
   private closedTabs: Array<{ url: string; title: string }> = [];
@@ -61,11 +63,12 @@ class Browser {
     this.updateGreeting();
     find.setupFindBar(this.s);
     ai.setupAiResize();
+    ai.initChatPanel(this.s);
     downloads.setupDownloads();
     downloads.setupPermissions();
     downloads.setupCertificateErrors();
     bookmarksBar.setupBookmarksBar(this.s, { navigate: (url) => this.navigate(url) });
-    this.setupContextMenu();
+
     this.setupFullscreen();
     this.setupKeyboardShortcuts();
     this.setupExtraEvents();
@@ -249,7 +252,18 @@ class Browser {
       });
     });
 
-    document.getElementById('ai-input')!.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !this.s.isStreaming) ai.sendChatMessage(this.s); });
+    const aiInput = document.getElementById('ai-input') as HTMLTextAreaElement;
+    aiInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey && !this.s.isStreaming) {
+        e.preventDefault();
+        ai.sendChatMessage(this.s);
+        aiInput.style.height = 'auto';
+      }
+    });
+    aiInput.addEventListener('input', () => {
+      aiInput.style.height = 'auto';
+      aiInput.style.height = `${Math.min(aiInput.scrollHeight, 120)}px`;
+    });
     document.getElementById('btn-send-ai')!.addEventListener('click', () => { if (!this.s.isStreaming) ai.sendChatMessage(this.s); });
     document.getElementById('btn-save-key')!.addEventListener('click', () => ai.saveApiKey());
     document.getElementById('btn-skip-key')!.addEventListener('click', () => ai.hideModal());
@@ -273,35 +287,7 @@ class Browser {
     document.getElementById('history-backdrop')?.addEventListener('click', () => history.hideHistory());
   }
 
-  private setupContextMenu() {
-    document.getElementById('webview-container')?.addEventListener('contextmenu', (e) => {
-      const tab = tabs.getActiveTab(this.s);
-      if (!tab?.webview) return;
 
-      tabs.hideContextMenu();
-      const menu = document.createElement('div');
-      menu.className = 'context-menu';
-      menu.style.left = `${e.clientX}px`;
-      menu.style.top = `${e.clientY}px`;
-
-      const items: Array<{ label: string; action: () => void; danger?: boolean }> = [
-        { label: 'Back', action: () => nav.goBack(this.s) },
-        { label: 'Forward', action: () => nav.goForward(this.s) },
-        { label: 'Reload', action: () => nav.reload(this.s) },
-        { label: 'Open DevTools', action: () => this.toggleDevTools() },
-      ];
-
-      items.forEach(({ label, action, danger }) => {
-        const btn = document.createElement('button');
-        btn.className = `context-menu-item${danger ? ' danger' : ''}`;
-        btn.textContent = label;
-        btn.addEventListener('click', () => { action(); menu.remove(); });
-        menu.appendChild(btn);
-      });
-
-      document.body.appendChild(menu);
-    });
-  }
 
   private setupFullscreen() {
     const container = document.getElementById('webview-container');
@@ -317,7 +303,7 @@ class Browser {
   }
 
   private setupMenuActions() {
-    window.electronAPI.onMenuAction((action: string) => {
+    window.electronAPI.onMenuAction((action: string, ...args: any[]) => {
       const urlBar = document.getElementById('url-bar') as HTMLInputElement;
       const tab = tabs.getActiveTab(this.s);
 
@@ -344,6 +330,7 @@ class Browser {
         case 'zoom-in': if (tab?.webview) { zoom.getZoomActions(tab.webview, tab.url).zoomIn(); } break;
         case 'zoom-out': if (tab?.webview) { zoom.getZoomActions(tab.webview, tab.url).zoomOut(); } break;
         case 'zoom-reset': if (tab?.webview) { zoom.getZoomActions(tab.webview, tab.url).zoomReset(); } break;
+        case 'open-url': if (args[0]) this.createTab(args[0]); break;
       }
     });
   }

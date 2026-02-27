@@ -17,6 +17,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('ai:stream-end', listener);
       return () => ipcRenderer.removeListener('ai:stream-end', listener);
     },
+    captureTab: () => ipcRenderer.invoke('ai:capture-tab'),
+    chatWithImage: (message: string, imageBase64: string, pageContext: string, history: Array<{ role: string; content: string }>, memory: string) =>
+      ipcRenderer.invoke('ai:chat-with-image', message, imageBase64, pageContext, history, memory),
   },
   db: {
     getProfile: () => ipcRenderer.invoke('db:get-profile'),
@@ -40,6 +43,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     importFromFile: () => ipcRenderer.invoke('db:import-from-file'),
     clearAll: () => ipcRenderer.invoke('db:clear-all'),
     migrateLocalStorage: (data: any) => ipcRenderer.invoke('db:migrate-localstorage', data),
+    chatCreate: (title?: string) => ipcRenderer.invoke('db:chat-create', title),
+    chatList: (limit?: number) => ipcRenderer.invoke('db:chat-list', limit),
+    chatMessages: (conversationId: number) => ipcRenderer.invoke('db:chat-messages', conversationId),
+    chatAddMessage: (conversationId: number, role: string, content: string) => ipcRenderer.invoke('db:chat-add-message', conversationId, role, content),
+    chatUpdateTitle: (conversationId: number, title: string) => ipcRenderer.invoke('db:chat-update-title', conversationId, title),
+    chatDelete: (conversationId: number) => ipcRenderer.invoke('db:chat-delete', conversationId),
+    chatMemory: (excludeId?: number) => ipcRenderer.invoke('db:chat-memory', excludeId),
   },
   downloads: {
     openFile: (filePath: string) => ipcRenderer.invoke('download:open-file', filePath),
@@ -107,7 +117,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   app: {
     getVersion: () => ipcRenderer.invoke('app:get-version'),
   },
-  onMenuAction: (callback: (action: string) => void) => {
-    ipcRenderer.on('menu:action', (_event, action: string) => callback(action));
+  onMenuAction: (callback: (action: string, ...args: any[]) => void) => {
+    ipcRenderer.on('menu:action', (_event, action: string, ...args: any[]) => callback(action, ...args));
   },
 });

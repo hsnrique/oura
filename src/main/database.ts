@@ -59,6 +59,22 @@ export function initDatabase(): void {
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS chat_conversations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL DEFAULT 'New Chat',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS chat_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      conversation_id INTEGER NOT NULL,
+      role TEXT NOT NULL,
+      content TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE
+    );
+
     INSERT OR IGNORE INTO user_profile (id) VALUES (1);
   `);
 }
@@ -221,4 +237,53 @@ export function migrateFromLocalStorage(data: { history?: any[]; bookmarks?: any
     }
   });
   transaction();
+}
+
+export function createConversation(title = 'New Chat') {
+  const result = db!.prepare('INSERT INTO chat_conversations (title) VALUES (?)').run(title);
+  return db!.prepare('SELECT * FROM chat_conversations WHERE id = ?').get(result.lastInsertRowid) as any;
+}
+
+export function getConversations(limit = 50) {
+  return db!.prepare('SELECT * FROM chat_conversations ORDER BY updated_at DESC LIMIT ?').all(limit);
+}
+
+export function getConversationMessages(conversationId: number) {
+  return db!.prepare('SELECT * FROM chat_messages WHERE conversation_id = ? ORDER BY created_at ASC').all(conversationId);
+}
+
+export function addChatMessage(conversationId: number, role: string, content: string) {
+  db!.prepare('INSERT INTO chat_messages (conversation_id, role, content) VALUES (?, ?, ?)').run(conversationId, role, content);
+  db!.prepare("UPDATE chat_conversations SET updated_at = datetime('now') WHERE id = ?").run(conversationId);
+}
+
+export function updateConversationTitle(conversationId: number, title: string) {
+  db!.prepare('UPDATE chat_conversations SET title = ? WHERE id = ?').run(title, conversationId);
+}
+
+export function deleteConversation(conversationId: number) {
+  db!.prepare('DELETE FROM chat_messages WHERE conversation_id = ?').run(conversationId);
+  db!.prepare('DELETE FROM chat_conversations WHERE id = ?').run(conversationId);
+}
+
+export function getRecentMemory(excludeConversationId?: number, limit = 5): string {
+  const conversations = db!.prepare(
+    'SELECT id, title FROM chat_conversations WHERE id != ? ORDER BY updated_at DESC LIMIT ?'
+  ).all(excludeConversationId ?? -1, limit) as any[];
+
+  if (conversations.length === 0) return '';
+
+  const snippets: string[] = [];
+  for (const conv of conversations) {
+    const messages = db!.prepare(
+      'SELECT role, content FROM chat_messages WHERE conversation_id = ? ORDER BY created_at DESC LIMIT 4'
+    ).all(conv.id) as any[];
+    if (messages.length === 0) continue;
+
+    const lines = messages.reverse().map((m: any) =>
+      `${m.role === 'user' ? 'User' : 'AI'}: ${m.content.substring(0, 200)}`
+    );
+    snippets.push(`[${conv.title}]\n${lines.join('\n')}`);
+  }
+  return snippets.join('\n\n');
 }

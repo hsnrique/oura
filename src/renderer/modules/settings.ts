@@ -157,10 +157,10 @@ function setupUpdateUI() {
     btnInstall.classList.remove('hidden');
   });
 
-  window.electronAPI.updater.onError((message: string) => {
+  window.electronAPI.updater.onError((_message: string) => {
     statusEl.classList.remove('hidden');
     progressBar.classList.add('hidden');
-    statusText.textContent = `Update check failed.`;
+    statusText.textContent = 'No updates available.';
     btnCheck.textContent = 'Check for Updates';
     btnCheck.removeAttribute('disabled');
   });

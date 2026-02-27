@@ -1,5 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 
+const SYSTEM_PROMPT = 'You are a helpful AI assistant integrated into a web browser called Oura. You help users understand web pages, answer questions about their content, and assist with general queries. Be concise and helpful. When memory from past conversations is provided, use it naturally to maintain context and continuity.';
+
 export class AIService {
   private client: GoogleGenAI;
   private model = 'gemini-3-flash-preview';
@@ -33,9 +35,15 @@ export class AIService {
   async *chat(
     message: string,
     pageContext: string,
-    history: Array<{ role: string; content: string }>
+    history: Array<{ role: string; content: string }>,
+    memory?: string,
   ): AsyncGenerator<string> {
     const truncatedContext = pageContext.substring(0, 10000);
+
+    let systemInstruction = SYSTEM_PROMPT;
+    if (memory) {
+      systemInstruction += `\n\nHere are relevant snippets from your past conversations with this user. Use them for context:\n${memory}`;
+    }
 
     const contents = [
       ...history.map((msg) => ({
@@ -56,9 +64,53 @@ export class AIService {
 
     const response = await this.client.models.generateContentStream({
       model: this.model,
-      config: {
-        systemInstruction: 'You are a helpful AI assistant integrated into a web browser. You help users understand web pages, answer questions about their content, and assist with general queries. Be concise and helpful.',
-      },
+      config: { systemInstruction },
+      contents,
+    });
+
+    for await (const chunk of response) {
+      const text = chunk.text;
+      if (text) yield text;
+    }
+  }
+
+  async *chatWithImage(
+    message: string,
+    imageBase64: string,
+    pageContext: string,
+    history: Array<{ role: string; content: string }>,
+    memory?: string,
+  ): AsyncGenerator<string> {
+    const truncatedContext = pageContext.substring(0, 10000);
+
+    let systemInstruction = SYSTEM_PROMPT;
+    if (memory) {
+      systemInstruction += `\n\nHere are relevant snippets from your past conversations with this user. Use them for context:\n${memory}`;
+    }
+
+    const imageData = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+
+    const parts: any[] = [
+      { inlineData: { mimeType: 'image/png', data: imageData } },
+    ];
+
+    if (pageContext) {
+      parts.push({ text: `Context from the current web page:\n${truncatedContext}\n\nUser question: ${message}` });
+    } else {
+      parts.push({ text: message });
+    }
+
+    const contents = [
+      ...history.map((msg) => ({
+        role: msg.role as 'user' | 'model',
+        parts: [{ text: msg.content }],
+      })),
+      { role: 'user' as const, parts },
+    ];
+
+    const response = await this.client.models.generateContentStream({
+      model: this.model,
+      config: { systemInstruction },
       contents,
     });
 
@@ -68,3 +120,4 @@ export class AIService {
     }
   }
 }
+
