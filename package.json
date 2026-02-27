@@ -1,7 +1,7 @@
 {
   "name": "oura-browser",
   "productName": "Oura Browser",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The browser, reimagined with AI",
   "author": "Henrique Martins",
   "license": "MIT",
