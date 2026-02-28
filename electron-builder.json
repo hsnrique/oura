@@ -18,7 +18,7 @@
   ],
   "mac": {
     "category": "public.app-category.productivity",
-    "identity": "Developer ID Application: Cyos Technologies LTDA (9GVR3YB53W)",
+    "identity": "Cyos Technologies LTDA (9GVR3YB53W)",
     "hardenedRuntime": true,
     "gatekeeperAssess": false,
     "entitlements": "build/entitlements.mac.plist",
