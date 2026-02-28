@@ -95,12 +95,12 @@ function buildMenu() {
         },
         { type: 'separator' as const },
         {
-          label: 'Zoom In',
+          label: 'Zoom In +',
           accelerator: 'CmdOrCtrl+Plus',
           click: () => sendToRenderer('menu:action', 'zoom-in'),
         },
         {
-          label: 'Zoom Out',
+          label: 'Zoom Out -',
           accelerator: 'CmdOrCtrl+-',
           click: () => sendToRenderer('menu:action', 'zoom-out'),
         },
