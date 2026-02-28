@@ -70,6 +70,7 @@ export function installUpdate() {
   setImmediate(() => {
     app.removeAllListeners('window-all-closed');
     BrowserWindow.getAllWindows().forEach(w => w.destroy());
-    autoUpdater.quitAndInstall(false, true);
+    app.relaunch();
+    autoUpdater.quitAndInstall(true, true);
   });
 }
