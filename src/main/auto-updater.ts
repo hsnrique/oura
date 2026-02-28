@@ -66,11 +66,9 @@ export function checkForUpdates() {
 }
 
 export function installUpdate() {
-  autoUpdater.autoInstallOnAppQuit = true;
   setImmediate(() => {
     app.removeAllListeners('window-all-closed');
     BrowserWindow.getAllWindows().forEach(w => w.destroy());
-    app.relaunch();
-    autoUpdater.quitAndInstall(true, true);
+    autoUpdater.quitAndInstall(false, true);
   });
 }
