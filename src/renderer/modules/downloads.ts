@@ -103,45 +103,6 @@ function renderDownloads() {
   });
 }
 
-export function setupPermissions() {
-  window.electronAPI.permissions.onRequest((permission) => {
-    const label = formatPermission(permission);
-    showPermissionBar(label, (granted) => {
-      window.electronAPI.permissions.respond(granted);
-    });
-  });
-}
-
-function formatPermission(perm: string): string {
-  const map: Record<string, string> = {
-    'media': 'camera and microphone',
-    'geolocation': 'your location',
-    'notifications': 'send notifications',
-    'midi': 'MIDI devices',
-    'mediaKeySystem': 'protected content',
-  };
-  return map[perm] || perm;
-}
-
-function showPermissionBar(label: string, callback: (granted: boolean) => void) {
-  const existing = document.getElementById('permission-bar');
-  if (existing) existing.remove();
-
-  const bar = document.createElement('div');
-  bar.id = 'permission-bar';
-  bar.innerHTML = `
-    <span>This site wants to access <strong>${label}</strong></span>
-    <div class="permission-actions">
-      <button class="btn-secondary btn-sm" id="perm-deny">Deny</button>
-      <button class="btn-primary btn-sm" id="perm-allow">Allow</button>
-    </div>
-  `;
-  document.getElementById('content-area')!.prepend(bar);
-
-  bar.querySelector('#perm-allow')!.addEventListener('click', () => { callback(true); bar.remove(); });
-  bar.querySelector('#perm-deny')!.addEventListener('click', () => { callback(false); bar.remove(); });
-  setTimeout(() => { if (bar.parentNode) { callback(false); bar.remove(); } }, 30000);
-}
 
 export function setupCertificateErrors() {
   window.electronAPI.certificate.onError((url) => {

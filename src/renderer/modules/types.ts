@@ -51,8 +51,11 @@ declare global {
         onDone: (callback: (item: DownloadInfo) => void) => () => void;
       };
       permissions: {
-        onRequest: (callback: (permission: string) => void) => void;
-        respond: (granted: boolean) => void;
+        onRequest: (callback: (data: { permission: string; origin: string }) => void) => void;
+        respond: (data: { granted: boolean; remember: boolean }) => void;
+        getSitePermissions: (origin: string) => Promise<Array<{ permission: string; allowed: number }>>;
+        setSitePermission: (origin: string, permission: string, allowed: boolean) => Promise<void>;
+        clearSitePermissions: (origin?: string) => Promise<void>;
       };
       certificate: {
         onError: (callback: (url: string) => void) => void;

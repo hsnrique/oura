@@ -75,6 +75,14 @@ export function initDatabase(): void {
       FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS site_permissions (
+      origin TEXT NOT NULL,
+      permission TEXT NOT NULL,
+      allowed INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY(origin, permission)
+    );
+
     INSERT OR IGNORE INTO user_profile (id) VALUES (1);
   `);
 }
@@ -157,6 +165,27 @@ export function removeShortcut(url: string) {
   db!.prepare('DELETE FROM shortcuts WHERE url = ?').run(url);
 }
 
+export function getPermission(origin: string, permission: string): boolean | null {
+  const row = db!.prepare('SELECT allowed FROM site_permissions WHERE origin = ? AND permission = ?').get(origin, permission) as any;
+  return row ? !!row.allowed : null;
+}
+
+export function setPermission(origin: string, permission: string, allowed: boolean) {
+  db!.prepare('INSERT OR REPLACE INTO site_permissions (origin, permission, allowed) VALUES (?, ?, ?)').run(origin, permission, allowed ? 1 : 0);
+}
+
+export function clearPermissions(origin?: string) {
+  if (origin) {
+    db!.prepare('DELETE FROM site_permissions WHERE origin = ?').run(origin);
+  } else {
+    db!.prepare('DELETE FROM site_permissions').run();
+  }
+}
+
+export function getSitePermissions(origin: string) {
+  return db!.prepare('SELECT permission, allowed FROM site_permissions WHERE origin = ?').all(origin);
+}
+
 export function getZoomLevel(domain: string): number {
   const row = db!.prepare('SELECT level FROM zoom_levels WHERE domain = ?').get(domain) as any;
   return row ? row.level : 0;
@@ -174,6 +203,7 @@ export function exportData(): object {
     bookmarks: getBookmarks(),
     history: getHistory(10000),
     shortcuts: getShortcuts(),
+    permissions: db!.prepare('SELECT * FROM site_permissions').all(),
   };
 }
 
@@ -207,6 +237,12 @@ export function importData(data: any) {
       const insert = db!.prepare('INSERT OR IGNORE INTO shortcuts (url, title, favicon, position) VALUES (?, ?, ?, ?)');
       data.shortcuts.forEach((s: any, i: number) => insert.run(s.url, s.title, s.favicon || '', i));
     }
+
+    if (data.permissions) {
+      db!.prepare('DELETE FROM site_permissions').run();
+      const insert = db!.prepare('INSERT OR IGNORE INTO site_permissions (origin, permission, allowed) VALUES (?, ?, ?)');
+      for (const p of data.permissions) insert.run(p.origin, p.permission, p.allowed);
+    }
   });
 
   transaction();
@@ -217,6 +253,7 @@ export function clearAllData() {
     DELETE FROM history;
     DELETE FROM bookmarks;
     DELETE FROM shortcuts;
+    DELETE FROM site_permissions;
     UPDATE user_profile SET name = '', avatar_path = '', onboarding_complete = 0 WHERE id = 1;
   `);
 }

@@ -209,13 +209,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
+  padding: 6px 14px;
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
   z-index: 50;
-  animation: slideDown 200ms ease;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+}
+
+#permission-bar.visible {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 #permission-bar.warning {
@@ -223,21 +230,160 @@
   border-color: rgba(251, 191, 36, 0.2);
 }
 
-@keyframes slideDown {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
+.permission-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
 
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.permission-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.permission-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.permission-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.permission-remember {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.permission-remember input[type="checkbox"] {
+  width: 12px;
+  height: 12px;
+  accent-color: var(--accent);
+  cursor: pointer;
 }
 
 .permission-actions {
   display: flex;
+  gap: 6px;
+}
+
+.permission-actions .btn-sm {
+  padding: 3px 10px;
+  font-size: 11px;
+}
+
+/* ========== Permissions Popup ========== */
+
+#permissions-popup {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 280px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  z-index: 1001;
+  animation: dropdownFadeIn 150ms ease;
+  overflow: hidden;
+}
+
+.perm-popup-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.perm-popup-hostname {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.perm-popup-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.perm-popup-list {
+  padding: 4px 0;
+}
+
+.perm-popup-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  transition: background var(--transition);
+}
+
+.perm-popup-row:hover {
+  background: var(--bg-surface);
+}
+
+.perm-popup-row-info {
+  display: flex;
+  align-items: center;
   gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.perm-popup-row-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.perm-popup-select {
+  padding: 2px 4px;
+  font-size: 11px;
+  font-family: inherit;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+}
+
+.perm-popup-select:focus {
+  border-color: var(--accent);
+}
+
+.perm-popup-select.allowed {
+  color: var(--green);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.perm-popup-select.denied {
+  color: var(--red, #ef4444);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.perm-popup-footer {
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* ========== History Panel ========== */

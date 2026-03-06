@@ -71,10 +71,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
   },
   permissions: {
-    onRequest: (callback: (permission: string) => void) => {
-      ipcRenderer.on('permission:request', (_e, perm) => callback(perm));
+    onRequest: (callback: (data: { permission: string; origin: string }) => void) => {
+      ipcRenderer.on('permission:request', (_e, data) => callback(data));
     },
-    respond: (granted: boolean) => ipcRenderer.send('permission:response', granted),
+    respond: (data: { granted: boolean; remember: boolean }) => ipcRenderer.send('permission:response', data),
+    getSitePermissions: (origin: string) => ipcRenderer.invoke('db:get-site-permissions', origin),
+    setSitePermission: (origin: string, permission: string, allowed: boolean) => ipcRenderer.invoke('db:set-site-permission', origin, permission, allowed),
+    clearSitePermissions: (origin?: string) => ipcRenderer.invoke('db:clear-site-permissions', origin),
   },
   certificate: {
     onError: (callback: (url: string) => void) => {

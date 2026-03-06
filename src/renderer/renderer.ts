@@ -6,6 +6,7 @@ import * as welcome from './modules/welcome';
 import * as ai from './modules/ai-panel';
 import * as cmd from './modules/command-palette';
 import * as find from './modules/find-bar';
+import * as permissions from './modules/permissions';
 import * as onboarding from './modules/onboarding';
 import * as settings from './modules/settings';
 import * as downloads from './modules/downloads';
@@ -65,7 +66,8 @@ class Browser {
     ai.setupAiResize();
     ai.initChatPanel(this.s);
     downloads.setupDownloads();
-    downloads.setupPermissions();
+    permissions.setupPermissions();
+    permissions.setupPermissionsPopup(this.s);
     downloads.setupCertificateErrors();
     bookmarksBar.setupBookmarksBar(this.s, { navigate: (url) => this.navigate(url) });
 

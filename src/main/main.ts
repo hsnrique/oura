@@ -296,20 +296,42 @@ function createWindow() {
     }
   });
 
-  session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) => {
-    const allowed = ['clipboard-read', 'clipboard-sanitized-write', 'pointerLock', 'fullscreen', 'hid', 'usb'];
-    if (allowed.includes(permission)) { callback(true); return; }
+  session.defaultSession.setPermissionRequestHandler((wc, permission, callback) => {
+    const silentAllow = ['clipboard-read', 'clipboard-sanitized-write', 'pointerLock', 'fullscreen', 'hid', 'usb'];
+    if (silentAllow.includes(permission)) { callback(true); return; }
+
+    let origin = '';
+    try { origin = new URL(wc.getURL()).origin; } catch { }
+
+    if (origin) {
+      const saved = database.getPermission(origin, permission);
+      if (saved !== null) { callback(saved); return; }
+    }
+
     if (mainWindow) {
-      mainWindow.webContents.send('permission:request', permission);
-      ipcMain.once('permission:response', (_e, granted: boolean) => callback(granted));
+      mainWindow.webContents.send('permission:request', { permission, origin });
+      ipcMain.once('permission:response', (_e, data: { granted: boolean; remember: boolean }) => {
+        if (data.remember && origin) {
+          database.setPermission(origin, permission, data.granted);
+        }
+        callback(data.granted);
+      });
     } else {
       callback(false);
     }
   });
 
-  session.defaultSession.setPermissionCheckHandler((_wc, permission) => {
-    const allowed = ['hid', 'usb'];
-    return allowed.includes(permission);
+  session.defaultSession.setPermissionCheckHandler((_wc, permission, requestingOrigin) => {
+    const silentAllow = ['clipboard-read', 'clipboard-sanitized-write', 'pointerLock', 'fullscreen', 'hid', 'usb'];
+    if (silentAllow.includes(permission)) return true;
+
+    let origin = '';
+    try { origin = new URL(requestingOrigin).origin; } catch { }
+    if (origin) {
+      const saved = database.getPermission(origin, permission);
+      if (saved !== null) return saved;
+    }
+    return true;
   });
 
   session.defaultSession.on('will-download', (_event, item) => {
@@ -514,6 +536,16 @@ function setupIPC() {
   ipcMain.handle('db:export-data', () => database.exportData());
   ipcMain.handle('db:import-data', (_e, data) => database.importData(data));
   ipcMain.handle('db:clear-all', () => database.clearAllData());
+
+  ipcMain.handle('db:get-site-permissions', (_e, origin: string) => {
+    return database.getSitePermissions(origin);
+  });
+  ipcMain.handle('db:set-site-permission', (_e, origin: string, permission: string, allowed: boolean) => {
+    database.setPermission(origin, permission, allowed);
+  });
+  ipcMain.handle('db:clear-site-permissions', (_e, origin?: string) => {
+    database.clearPermissions(origin);
+  });
   ipcMain.handle('db:migrate-localstorage', (_e, data) => database.migrateFromLocalStorage(data));
 
   ipcMain.handle('db:export-to-file', async () => {
