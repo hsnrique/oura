@@ -147,14 +147,24 @@ async function startLive() {
   liveTranscriptRaw = '';
 
   let pageContext = '';
-  if (browserState) {
-    const { html, url } = await getPageContent(browserState);
-    if (html) pageContext = `URL: ${url}\n\n${html.slice(0, 8000)}`;
+  try {
+    if (browserState) {
+      const { html, url } = await getPageContent(browserState);
+      if (html) pageContext = `URL: ${url}\n\n${html.slice(0, 8000)}`;
+    }
+  } catch {
+    console.warn('Could not get page content for Live mode');
   }
 
-  const result = await window.electronAPI.live.start(pageContext || undefined);
-  if (result.error) {
-    addMessage('ai', `Live mode error: ${result.error}`);
+  try {
+    const result = await window.electronAPI.live.start(pageContext || undefined);
+    if (result.error) {
+      addMessage('ai', `Live mode error: ${result.error}`);
+      updateLiveUI(false);
+      return;
+    }
+  } catch (err: any) {
+    addMessage('ai', `Failed to start live session: ${err.message || err}`);
     updateLiveUI(false);
     return;
   }

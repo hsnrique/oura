@@ -523,30 +523,35 @@ function setupIPC() {
     const config = loadConfig();
     if (!config.apiKey) return { error: 'API key not set' };
     try {
+      console.log('[Live] Starting live session...');
       liveService = new LiveService(config.apiKey);
       let systemInstruction = 'You are a helpful AI assistant integrated into a web browser called Oura. You help users understand web pages, answer questions about their content, and assist with general queries. Be concise and conversational.';
       if (pageContext) {
         systemInstruction += `\n\nThe user is currently viewing a web page. Here is the page content:\n${pageContext}`;
       }
-      await liveService.connect({
-        onAudioChunk: (base64Audio) => {
-          event.sender.send('live:audio-chunk', base64Audio);
-        },
-        onTextChunk: (text) => {
-          event.sender.send('live:text-chunk', text);
-        },
-        onInterrupted: () => {
-          event.sender.send('live:interrupted');
-        },
-        onError: (error) => {
-          event.sender.send('live:error', error);
-        },
-        onClose: () => {
-          event.sender.send('live:closed');
-        },
+
+      const sender = event.sender;
+      const safeSend = (channel: string, ...args: any[]) => {
+        if (!sender.isDestroyed()) sender.send(channel, ...args);
+      };
+
+      const connectPromise = liveService.connect({
+        onAudioChunk: (base64Audio) => safeSend('live:audio-chunk', base64Audio),
+        onTextChunk: (text) => safeSend('live:text-chunk', text),
+        onInterrupted: () => safeSend('live:interrupted'),
+        onError: (error) => safeSend('live:error', error),
+        onClose: () => safeSend('live:closed'),
       }, systemInstruction, config.voice);
+
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Connection timed out after 15s')), 15000),
+      );
+
+      await Promise.race([connectPromise, timeout]);
+      console.log('[Live] Session connected successfully');
       return { success: true };
     } catch (err: any) {
+      console.error('[Live] Failed to start:', err.message);
       return { error: err.message };
     }
   });
