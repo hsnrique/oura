@@ -55,7 +55,10 @@ export function switchTab(
   const tab = getActiveTab(state);
 
   state.tabs.forEach(t => {
-    if (t.webview) (t.webview as HTMLElement).classList.remove('active');
+    if (t.webview) {
+      (t.webview as HTMLElement).classList.remove('active');
+      (t.webview as HTMLElement).blur();
+    }
   });
   if (tab?.webview) (tab.webview as HTMLElement).classList.add('active');
 
@@ -68,6 +71,10 @@ export function switchTab(
     callbacks.updateGreeting();
   } else {
     welcomePage.classList.add('hidden');
+  }
+
+  if (!tab?.webview) {
+    window.focus();
   }
 
   callbacks.renderTabs();
