@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, session, Menu, MenuItemConstructorOptions,
 import * as path from 'path';
 import * as fs from 'fs';
 import { AIService } from './ai-service';
+import { LiveService } from './live-service';
 import * as database from './database';
 import { initAutoUpdater, checkForUpdates, installUpdate } from './auto-updater';
 
@@ -212,6 +213,7 @@ function buildMenu() {
 
 let mainWindow: BrowserWindow | null = null;
 let aiService: AIService | null = null;
+let liveService: LiveService | null = null;
 
 interface DownloadItem {
   id: string;
@@ -225,7 +227,7 @@ const activeDownloads = new Map<string, DownloadItem>();
 
 const CONFIG_PATH = path.join(app.getPath('userData'), 'config.json');
 
-function loadConfig(): { apiKey?: string; model?: string } {
+function loadConfig(): { apiKey?: string; model?: string; voice?: string } {
   try {
     if (fs.existsSync(CONFIG_PATH)) {
       return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
@@ -234,7 +236,7 @@ function loadConfig(): { apiKey?: string; model?: string } {
   return {};
 }
 
-function saveConfig(config: { apiKey?: string; model?: string }) {
+function saveConfig(config: { apiKey?: string; model?: string; voice?: string }) {
   const existing = loadConfig();
   fs.writeFileSync(CONFIG_PATH, JSON.stringify({ ...existing, ...config }, null, 2));
 }
@@ -453,6 +455,16 @@ function setupIPC() {
     return config.model || 'gemini-3.1-flash-lite-preview';
   });
 
+  ipcMain.handle('ai:set-voice', async (_event, voice: string) => {
+    saveConfig({ voice });
+    return true;
+  });
+
+  ipcMain.handle('ai:get-voice', async () => {
+    const config = loadConfig();
+    return config.voice || 'Zephyr';
+  });
+
   ipcMain.handle('ai:get-api-key', async () => {
     const config = loadConfig();
     if (config.apiKey) {
@@ -504,6 +516,58 @@ function setupIPC() {
       return { result };
     } catch (err: any) {
       return { error: err.message };
+    }
+  });
+
+  ipcMain.handle('live:start', async (event, pageContext?: string) => {
+    const config = loadConfig();
+    if (!config.apiKey) return { error: 'API key not set' };
+    try {
+      liveService = new LiveService(config.apiKey);
+      let systemInstruction = 'You are a helpful AI assistant integrated into a web browser called Oura. You help users understand web pages, answer questions about their content, and assist with general queries. Be concise and conversational.';
+      if (pageContext) {
+        systemInstruction += `\n\nThe user is currently viewing a web page. Here is the page content:\n${pageContext}`;
+      }
+      await liveService.connect({
+        onAudioChunk: (base64Audio) => {
+          event.sender.send('live:audio-chunk', base64Audio);
+        },
+        onTextChunk: (text) => {
+          event.sender.send('live:text-chunk', text);
+        },
+        onInterrupted: () => {
+          event.sender.send('live:interrupted');
+        },
+        onError: (error) => {
+          event.sender.send('live:error', error);
+        },
+        onClose: () => {
+          event.sender.send('live:closed');
+        },
+      }, systemInstruction, config.voice);
+      return { success: true };
+    } catch (err: any) {
+      return { error: err.message };
+    }
+  });
+
+  ipcMain.handle('live:stop', async () => {
+    if (liveService) {
+      await liveService.disconnect();
+      liveService = null;
+    }
+    return { success: true };
+  });
+
+  ipcMain.on('live:send-audio', (_event, base64Data: string) => {
+    if (liveService?.isConnected) {
+      liveService.sendAudio(base64Data);
+    }
+  });
+
+  ipcMain.on('live:send-text', (_event, text: string) => {
+    if (liveService?.isConnected) {
+      liveService.sendText(text);
     }
   });
 

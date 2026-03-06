@@ -8,12 +8,25 @@ declare global {
         getApiKey: () => Promise<string | null>;
         setModel: (model: string) => Promise<boolean>;
         getModel: () => Promise<string>;
+        setVoice: (voice: string) => Promise<boolean>;
+        getVoice: () => Promise<string>;
         summarize: (html: string, url: string) => Promise<{ result?: string; error?: string }>;
         chat: (message: string, pageContext: string, history: Array<{ role: string; content: string }>) => Promise<{ result?: string; error?: string }>;
         onStreamChunk: (callback: (chunk: string) => void) => () => void;
         onStreamEnd: (callback: () => void) => () => void;
         captureTab: () => Promise<string | null>;
         chatWithImage: (message: string, imageBase64: string, pageContext: string, history: Array<{ role: string; content: string }>, memory: string) => Promise<{ result?: string; error?: string }>;
+      };
+      live: {
+        start: (pageContext?: string) => Promise<{ success?: boolean; error?: string }>;
+        stop: () => Promise<{ success?: boolean }>;
+        sendAudio: (base64Data: string) => void;
+        sendText: (text: string) => void;
+        onAudioChunk: (callback: (data: string) => void) => () => void;
+        onTextChunk: (callback: (text: string) => void) => () => void;
+        onInterrupted: (callback: () => void) => () => void;
+        onError: (callback: (error: string) => void) => () => void;
+        onClosed: (callback: () => void) => () => void;
       };
       db: {
         getProfile: () => Promise<any>;

@@ -157,3 +157,73 @@
   border-radius: 2px;
   transition: width 300ms ease;
 }
+
+.settings-permissions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-empty-state {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.settings-permission-site {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.settings-permission-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-permission-origin {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.settings-permission-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.settings-permission-row:not(:last-child) {
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.04));
+}
+
+.settings-permission-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.settings-permission-badge.allowed {
+  background: rgba(74, 222, 128, 0.12);
+  color: #4ade80;
+}
+
+.settings-permission-badge.denied {
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+}
+
+.btn-xs {
+  font-size: 10px;
+  padding: 3px 8px;
+}

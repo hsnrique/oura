@@ -4,6 +4,7 @@ import * as tabs from './modules/tabs';
 import * as nav from './modules/navigation';
 import * as welcome from './modules/welcome';
 import * as ai from './modules/ai-panel';
+import * as aiLive from './modules/ai-live';
 import * as cmd from './modules/command-palette';
 import * as find from './modules/find-bar';
 import * as permissions from './modules/permissions';
@@ -68,6 +69,7 @@ class Browser {
     downloads.setupDownloads();
     permissions.setupPermissions();
     permissions.setupPermissionsPopup(this.s);
+    aiLive.setupLiveMode(this.s);
     downloads.setupCertificateErrors();
     bookmarksBar.setupBookmarksBar(this.s, { navigate: (url) => this.navigate(url) });
 

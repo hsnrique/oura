@@ -6,6 +6,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getApiKey: () => ipcRenderer.invoke('ai:get-api-key'),
     setModel: (model: string) => ipcRenderer.invoke('ai:set-model', model),
     getModel: () => ipcRenderer.invoke('ai:get-model'),
+    setVoice: (voice: string) => ipcRenderer.invoke('ai:set-voice', voice),
+    getVoice: () => ipcRenderer.invoke('ai:get-voice'),
     summarize: (html: string, url: string) => ipcRenderer.invoke('ai:summarize', html, url),
     chat: (message: string, pageContext: string, history: Array<{ role: string; content: string }>) =>
       ipcRenderer.invoke('ai:chat', message, pageContext, history),
@@ -22,6 +24,37 @@ contextBridge.exposeInMainWorld('electronAPI', {
     captureTab: () => ipcRenderer.invoke('ai:capture-tab'),
     chatWithImage: (message: string, imageBase64: string, pageContext: string, history: Array<{ role: string; content: string }>, memory: string) =>
       ipcRenderer.invoke('ai:chat-with-image', message, imageBase64, pageContext, history, memory),
+  },
+  live: {
+    start: (pageContext?: string) => ipcRenderer.invoke('live:start', pageContext),
+    stop: () => ipcRenderer.invoke('live:stop'),
+    sendAudio: (base64Data: string) => ipcRenderer.send('live:send-audio', base64Data),
+    sendText: (text: string) => ipcRenderer.send('live:send-text', text),
+    onAudioChunk: (callback: (data: string) => void) => {
+      const listener = (_e: any, data: string) => callback(data);
+      ipcRenderer.on('live:audio-chunk', listener);
+      return () => ipcRenderer.removeListener('live:audio-chunk', listener);
+    },
+    onTextChunk: (callback: (text: string) => void) => {
+      const listener = (_e: any, text: string) => callback(text);
+      ipcRenderer.on('live:text-chunk', listener);
+      return () => ipcRenderer.removeListener('live:text-chunk', listener);
+    },
+    onInterrupted: (callback: () => void) => {
+      const listener = () => callback();
+      ipcRenderer.on('live:interrupted', listener);
+      return () => ipcRenderer.removeListener('live:interrupted', listener);
+    },
+    onError: (callback: (error: string) => void) => {
+      const listener = (_e: any, error: string) => callback(error);
+      ipcRenderer.on('live:error', listener);
+      return () => ipcRenderer.removeListener('live:error', listener);
+    },
+    onClosed: (callback: () => void) => {
+      const listener = () => callback();
+      ipcRenderer.on('live:closed', listener);
+      return () => ipcRenderer.removeListener('live:closed', listener);
+    },
   },
   db: {
     getProfile: () => ipcRenderer.invoke('db:get-profile'),

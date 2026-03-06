@@ -85,6 +85,11 @@ export function setupSettings(
     }
   });
 
+  const voiceSelect = document.getElementById('settings-voice') as HTMLSelectElement;
+  voiceSelect.addEventListener('change', () => {
+    window.electronAPI.ai.setVoice(voiceSelect.value);
+  });
+
   setupUpdateUI();
 }
 
@@ -101,8 +106,63 @@ export async function showSettings(state: BrowserState) {
   apiKeyInput.placeholder = existingKey ? 'Key saved — enter new key to replace' : 'Enter API key';
   apiKeyInput.value = '';
 
+  const savedVoice = await window.electronAPI.ai.getVoice();
+  (document.getElementById('settings-voice') as HTMLSelectElement).value = savedVoice;
+
+  await renderPermissionsList();
+
   const version = await window.electronAPI.app.getVersion();
   document.getElementById('settings-version')!.textContent = `v${version}`;
+}
+
+async function renderPermissionsList() {
+  const container = document.getElementById('settings-permissions-list')!;
+  const permissions: any[] = await window.electronAPI.permissions.getSitePermissions('');
+
+  if (!permissions || permissions.length === 0) {
+    container.innerHTML = '<p class="settings-empty-state">No site permissions saved.</p>';
+    return;
+  }
+
+  const grouped: Record<string, Array<{ permission: string; allowed: number }>> = {};
+  for (const p of permissions) {
+    const origin = p.origin as string;
+    if (!grouped[origin]) grouped[origin] = [];
+    grouped[origin].push({ permission: p.permission_type as string, allowed: p.allowed as number });
+  }
+
+  container.innerHTML = '';
+  for (const [origin, perms] of Object.entries(grouped)) {
+    const siteEl = document.createElement('div');
+    siteEl.className = 'settings-permission-site';
+
+    const header = document.createElement('div');
+    header.className = 'settings-permission-header';
+    header.innerHTML = `
+      <span class="settings-permission-origin">${origin}</span>
+      <button class="btn-secondary btn-xs btn-danger" data-origin="${origin}">Clear</button>
+    `;
+    siteEl.appendChild(header);
+
+    header.querySelector('button')!.addEventListener('click', async () => {
+      await window.electronAPI.permissions.clearSitePermissions(origin);
+      await renderPermissionsList();
+    });
+
+    for (const p of perms) {
+      const row = document.createElement('div');
+      row.className = 'settings-permission-row';
+      const statusClass = p.allowed ? 'allowed' : 'denied';
+      const statusLabel = p.allowed ? 'Allowed' : 'Denied';
+      row.innerHTML = `
+        <span>${p.permission}</span>
+        <span class="settings-permission-badge ${statusClass}">${statusLabel}</span>
+      `;
+      siteEl.appendChild(row);
+    }
+
+    container.appendChild(siteEl);
+  }
 }
 
 export function hideSettings() {

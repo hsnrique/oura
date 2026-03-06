@@ -73,7 +73,7 @@ export function toggleAiPanel() {
   btn.classList.toggle('active', isHidden);
 }
 
-async function getPageContent(state: BrowserState): Promise<{ html: string; url: string }> {
+export async function getPageContent(state: BrowserState): Promise<{ html: string; url: string }> {
   const tab = getActiveTab(state);
   if (!tab?.webview) return { html: '', url: '' };
   try {
@@ -84,7 +84,7 @@ async function getPageContent(state: BrowserState): Promise<{ html: string; url:
   }
 }
 
-function addMessage(role: 'user' | 'ai', content: string): HTMLElement {
+export function addMessage(role: 'user' | 'ai', content: string): HTMLElement {
   const container = document.getElementById('ai-messages')!;
   const wrapper = document.createElement('div');
   wrapper.className = 'ai-message-wrapper';
