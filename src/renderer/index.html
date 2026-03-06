@@ -150,7 +150,11 @@
                 <line x1="3" y1="18" x2="21" y2="18"></line>
               </svg>
             </button>
-            <span id="ai-panel-title">Assistant</span>
+            <select id="ai-model-select" title="Select AI Model">
+              <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
+              <option value="gemini-3-flash-preview" selected>Gemini 3 Flash</option>
+              <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Lite</option>
+            </select>
           </div>
           <div class="ai-header-right">
             <button id="btn-new-chat" class="nav-btn" title="New Chat">

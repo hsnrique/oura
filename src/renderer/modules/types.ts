@@ -6,6 +6,8 @@ declare global {
       ai: {
         setApiKey: (key: string) => Promise<boolean>;
         getApiKey: () => Promise<string | null>;
+        setModel: (model: string) => Promise<boolean>;
+        getModel: () => Promise<string>;
         summarize: (html: string, url: string) => Promise<{ result?: string; error?: string }>;
         chat: (message: string, pageContext: string, history: Array<{ role: string; content: string }>) => Promise<{ result?: string; error?: string }>;
         onStreamChunk: (callback: (chunk: string) => void) => () => void;

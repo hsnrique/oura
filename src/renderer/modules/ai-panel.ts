@@ -365,4 +365,13 @@ export async function initChatPanel(state: BrowserState) {
       convToggle.classList.toggle('active');
     });
   }
+
+  const modelSelect = document.getElementById('ai-model-select') as HTMLSelectElement;
+  if (modelSelect) {
+    const savedModel = await window.electronAPI.ai.getModel();
+    modelSelect.value = savedModel;
+    modelSelect.addEventListener('change', () => {
+      window.electronAPI.ai.setModel(modelSelect.value);
+    });
+  }
 }

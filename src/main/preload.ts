@@ -4,6 +4,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   ai: {
     setApiKey: (key: string) => ipcRenderer.invoke('ai:set-api-key', key),
     getApiKey: () => ipcRenderer.invoke('ai:get-api-key'),
+    setModel: (model: string) => ipcRenderer.invoke('ai:set-model', model),
+    getModel: () => ipcRenderer.invoke('ai:get-model'),
     summarize: (html: string, url: string) => ipcRenderer.invoke('ai:summarize', html, url),
     chat: (message: string, pageContext: string, history: Array<{ role: string; content: string }>) =>
       ipcRenderer.invoke('ai:chat', message, pageContext, history),

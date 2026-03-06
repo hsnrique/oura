@@ -10,6 +10,10 @@ export class AIService {
     this.client = new GoogleGenAI({ apiKey });
   }
 
+  setModel(model: string) {
+    this.model = model;
+  }
+
   async *summarizePage(html: string, url: string): AsyncGenerator<string> {
     const truncatedHtml = html.substring(0, 15000);
     const response = await this.client.models.generateContentStream({

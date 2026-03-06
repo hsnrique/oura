@@ -225,7 +225,7 @@ const activeDownloads = new Map<string, DownloadItem>();
 
 const CONFIG_PATH = path.join(app.getPath('userData'), 'config.json');
 
-function loadConfig(): { apiKey?: string } {
+function loadConfig(): { apiKey?: string; model?: string } {
   try {
     if (fs.existsSync(CONFIG_PATH)) {
       return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
@@ -234,8 +234,9 @@ function loadConfig(): { apiKey?: string } {
   return {};
 }
 
-function saveConfig(config: { apiKey?: string }) {
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+function saveConfig(config: { apiKey?: string; model?: string }) {
+  const existing = loadConfig();
+  fs.writeFileSync(CONFIG_PATH, JSON.stringify({ ...existing, ...config }, null, 2));
 }
 
 function readAvatarAsDataUrl(filePath: string): string | null {
@@ -441,10 +442,22 @@ function setupIPC() {
     return true;
   });
 
+  ipcMain.handle('ai:set-model', async (_event, model: string) => {
+    if (aiService) aiService.setModel(model);
+    saveConfig({ model });
+    return true;
+  });
+
+  ipcMain.handle('ai:get-model', async () => {
+    const config = loadConfig();
+    return config.model || 'gemini-3.1-flash-lite-preview';
+  });
+
   ipcMain.handle('ai:get-api-key', async () => {
     const config = loadConfig();
     if (config.apiKey) {
       aiService = new AIService(config.apiKey);
+      if (config.model) aiService.setModel(config.model);
     }
     return config.apiKey || null;
   });

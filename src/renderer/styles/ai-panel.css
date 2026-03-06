@@ -58,6 +58,30 @@
   box-shadow: 0 0 8px var(--accent-glow);
 }
 
+#ai-model-select {
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition);
+}
+
+#ai-model-select:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+#ai-model-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
 #ai-actions {
   display: flex;
   gap: 6px;
@@ -150,6 +174,8 @@
   line-height: 1.7;
   color: var(--text-secondary);
   word-wrap: break-word;
+  user-select: text;
+  cursor: text;
 }
 
 .ai-message-content p {
