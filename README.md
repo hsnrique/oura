@@ -90,6 +90,15 @@ The packaged `.app` / `.dmg` will be in the `release/` directory.
 
 <br />
 
+## Support
+
+If you find Synapse useful, consider supporting the project:
+
+| | Link |
+|---|---|
+| ☕ **Buy Me a Coffee** (US/EU) | [buymeacoffee.com/hsnrique](https://buymeacoffee.com/hsnrique) |
+| 💜 **Pix** (BR) | [livepix.gg/hsnrique](https://livepix.gg/hsnrique) |
+
 ## 📄 License
 
 [MIT](LICENSE) — Free to use, modify, and distribute with attribution.
