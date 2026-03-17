@@ -92,7 +92,7 @@ The packaged `.app` / `.dmg` will be in the `release/` directory.
 
 ## Support
 
-If you find Synapse useful, consider supporting the project:
+If you find this project useful, consider supporting the project:
 
 | | Link |
 |---|---|
